@@ -1,14 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"go-hacktiv8/interface/service"
+	"github.com/zakariawahyu/go-hacktiv8/interface/service"
+	"net/http"
 )
 
 func main() {
-	userServices := service.NewUserServices()
-	result := userServices.Register(&service.User{
-		"Zaka",
-	})
-	fmt.Println(result)
+	var db []*service.User
+	userServices := service.NewUserServices(db)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/post-user", userServices.PostUserServer)
+	mux.HandleFunc("/get-user", userServices.GetUserServer)
+
+	http.ListenAndServe("localhost:8081", mux)
 }
