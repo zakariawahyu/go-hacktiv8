@@ -7,6 +7,7 @@ import (
 
 type OrderRepository interface {
 	Create(order entity.Order) (entity.Order, error)
+	FindById(orderID string) (entity.Order, error)
 }
 
 type OrderRepositoryImpl struct {
@@ -19,9 +20,21 @@ func NewOrderRepository(database *gorm.DB) OrderRepository {
 	}
 }
 
-func (OrderRepo *OrderRepositoryImpl) Create(order entity.Order) (entity.Order, error) {
-	if err := OrderRepo.db.Create(&order).Error; err != nil {
+func (orderRepo *OrderRepositoryImpl) Create(order entity.Order) (entity.Order, error) {
+	if err := orderRepo.db.Create(&order).Error; err != nil {
 		return order, err
 	}
+	return order, nil
+}
+
+func (orderRepo *OrderRepositoryImpl) FindById(orderID string) (entity.Order, error) {
+	var order entity.Order
+	result := orderRepo.db.Where("order_id = ?", orderID).First(&order)
+
+	if result.RowsAffected == 0 {
+		return order, result.Error
+	}
+
+	orderRepo.db.Preload("Items").Find(&order)
 	return order, nil
 }

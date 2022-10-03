@@ -10,6 +10,7 @@ import (
 
 type OrderServices interface {
 	CreateOrder(request dto.CreateOrderRequest) (*response.OrderResponse, error)
+	FindOrderById(orderID string) (*response.OrderResponse, error)
 }
 
 type OrderServicesImpl struct {
@@ -38,5 +39,15 @@ func (orderServices *OrderServicesImpl) CreateOrder(request dto.CreateOrderReque
 
 	res := response.NewOrderResponse(insertOrder)
 
+	return &res, nil
+}
+
+func (orderServices *OrderServicesImpl) FindOrderById(orderID string) (*response.OrderResponse, error) {
+	result, err := orderServices.orderRepo.FindById(orderID)
+	if err != nil {
+		return nil, err
+	}
+
+	res := response.NewOrderResponse(result)
 	return &res, nil
 }
