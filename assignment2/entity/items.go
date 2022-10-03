@@ -5,6 +5,5 @@ type Items struct {
 	ItemCode    string `gorm:"type:varchar(100)" json:"-"`
 	Description string `gorm:"type:text" json:"-"`
 	Quantity    int    `gorm:"type:integer" json:"-"`
-	OrderID     int    `gorm:"type:integer" json:"-"`
-	Order       Order  `json:"-"`
+	OrderID     int64  `gorm:"type:integer" json:"-"`
 }
