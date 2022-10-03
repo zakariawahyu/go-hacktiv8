@@ -8,6 +8,7 @@ import (
 type OrderRepository interface {
 	Create(order entity.Order) (entity.Order, error)
 	FindById(orderID string) (entity.Order, error)
+	Delete(orderID string) (entity.Order, error)
 }
 
 type OrderRepositoryImpl struct {
@@ -30,6 +31,18 @@ func (orderRepo *OrderRepositoryImpl) Create(order entity.Order) (entity.Order, 
 func (orderRepo *OrderRepositoryImpl) FindById(orderID string) (entity.Order, error) {
 	var order entity.Order
 	result := orderRepo.db.Where("order_id = ?", orderID).First(&order)
+
+	if result.RowsAffected == 0 {
+		return order, result.Error
+	}
+
+	orderRepo.db.Preload("Items").Find(&order)
+	return order, nil
+}
+
+func (orderRepo *OrderRepositoryImpl) Delete(orderID string) (entity.Order, error) {
+	var order entity.Order
+	result := orderRepo.db.Where("order_id = ?", orderID).Delete(&order)
 
 	if result.RowsAffected == 0 {
 		return order, result.Error
