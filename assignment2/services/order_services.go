@@ -9,6 +9,7 @@ import (
 )
 
 type OrderServices interface {
+	CreateOrder(request dto.CreateOrderRequest) (*response.OrderResponse, error)
 }
 
 type OrderServicesImpl struct {
@@ -33,17 +34,6 @@ func (orderServices *OrderServicesImpl) CreateOrder(request dto.CreateOrderReque
 	insertOrder, err := orderServices.orderRepo.Create(order)
 	if err != nil {
 		return nil, err
-	}
-
-	if insertOrder.OrderID > 0 {
-		for _, value := range order.Items {
-			_, _ = orderServices.itemsRepo.Create(entity.Items{
-				ItemCode:    value.ItemCode,
-				Description: value.Description,
-				Quantity:    value.Quantity,
-				OrderID:     insertOrder.OrderID,
-			})
-		}
 	}
 
 	res := response.NewOrderResponse(insertOrder)
